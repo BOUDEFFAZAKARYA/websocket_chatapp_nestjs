@@ -24,14 +24,15 @@ export class MessagesGateway {
 
 
   @SubscribeMessage('createMessage')
-  async create(@MessageBody() createMessageDto: CreateMessageDto) {
-    const message = await this.messagesService.create(createMessageDto);
+  async create(@MessageBody() createMessageDto: CreateMessageDto ,     @ConnectedSocket() client:Socket
+  ) {
+    const message = await this.messagesService.create(createMessageDto , client.id);
     this.server.emit('message', message);
     return message;
   }
 
   @SubscribeMessage('findAllMessages')
-  findAll() {
+  async findAll() {
     return this.messagesService.findAll();
   }
 
@@ -40,8 +41,9 @@ export class MessagesGateway {
     @MessageBody("name") name :string ,
     @ConnectedSocket() client:Socket
   ) {
+    const id =client.id ;
 
-    this.messagesService.identify(name , client.id);
+    return this.messagesService.identify(name , id);
   }
 
 
